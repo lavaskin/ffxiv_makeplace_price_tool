@@ -196,7 +196,6 @@ if __name__ == '__main__':
 
 		# If the home_file_name is "list", show the available house lists
 		# Also only run if other parameters are not included as there could potentially be a house named "list"
-		print(home_file_name)
 		if home_file_name == 'list' and len(sys.argv) == 2:
 			get_house_item_list_options(makeplace_dir)
 			sys.exit(0)
