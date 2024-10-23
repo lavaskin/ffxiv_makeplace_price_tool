@@ -19,7 +19,5 @@ Fetches relevant housing item prices and tallies them up given a MakePlace house
 ## Links
 
 - [MakePlace](https://makeplace.app/places): For getting house item lists
-- [XIVApi](https://xivapi.com/docs/Search#search): For item information
-- [Universalis Api](https://docs.universalis.app): For Pricing Data
-- [XIV World Data Dump](https://github.com/xivapi/ffxiv-datamining/blob/master/csv/World.csv): For use in the Universalis API for where to look for prices
-- [XIV Item Dump](https://raw.githubusercontent.com/ffxiv-teamcraft/ffxiv-teamcraft/master/libs/data/src/lib/json/items.json): For item ID lookup
+- [Universalis Api](https://docs.universalis.app): For the pricing data API
+- [XIV Item Dump](https://raw.githubusercontent.com/ffxiv-teamcraft/ffxiv-teamcraft/master/libs/data/src/lib/json/items.json): For local item ID lookup
