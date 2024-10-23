@@ -109,9 +109,12 @@ def get_item_prices(item_ids: list[int], item_prices: list[Item], items_dict: di
 			item_id = needed_item_ids[i]
 			item_name = get_item_name(item_id, items_dict)
 			api_price = int(api.get_item_price(item_id, api_prices))
-			res_item_prices[item_id] = api_price
+			if api_price == -1:
+				print(f'Error: Could not get price for {item_name} (ID: {item_id})')
+				continue
 
 			# Save the new prices to the item prices dictionary
+			res_item_prices[item_id] = api_price
 			item = Item(item_id, item_name, api_price)
 			set_item_price(item, item_prices)
 
@@ -182,6 +185,6 @@ if __name__ == '__main__':
 		home_file_name = sys.argv[1]
 	else:
 		print('Error: No file name provided.')
-		sys.exit()
+		sys.exit(0)
 
 	main(home_file_name)
