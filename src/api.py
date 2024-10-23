@@ -28,12 +28,12 @@ class UniversalisApi:
 	#end get_item_prices
 
 	# Given an item id and a list of price objects from get_item_prices, returns the price of the item
-	# If the item is not found, returns -1
+	# If the item is not found, returns None
 	def get_item_price(self, item_id: int, item_price_list: list) -> int:
 		# Find the item in the list
 		item = next((x for x in item_price_list if x['itemId'] == item_id), None)
 		if (item == None):
-			return -1
+			return None
 
 		# Check first if there's a price for the item in the dc item['nq']['averageSalePrice']['dc']['price']
 		item_average_price: dict = item['nq']['averageSalePrice']
@@ -45,7 +45,7 @@ class UniversalisApi:
 			return item_average_price['region']['price']
 		
 		# If no price is found, return -1
-		return -1
+		return None
 	#end get_item_price
 
 	def get_available_worlds(self) -> dict:

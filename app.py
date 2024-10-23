@@ -34,13 +34,13 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 			for i in range(len(needed_item_ids)):
 				item_id = needed_item_ids[i]
 				item_name = local_data.get_item_name(item_id)
-				api_price = int(api.get_item_price(item_id, api_prices))
-				if api_price == -1:
+				api_price = api.get_item_price(item_id, api_prices)
+				if api_price == None:
 					continue
 
 				# Save the new prices to the item prices dictionary
-				res_item_prices[item_id] = api_price
-				item = Item(item_id, item_name, api_price)
+				res_item_prices[item_id] = int(api_price)
+				item = Item(item_id, item_name, int(api_price))
 				local_data.set_item_price(item)
 
 	# Return the dictionary of item prices
