@@ -1,4 +1,6 @@
 import sys
+import os
+from dotenv import load_dotenv
 
 from src.item import Item
 from src.api import UniversalisApi
@@ -21,6 +23,8 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 			needed_item_ids.append(item_id)
 		else:
 			res_item_prices[item_id] = price
+	
+	print(f'Found {len(res_item_prices)} prices in local storage from the last 24hrs.')
 	
 	# Get the prices for the items from Universalis
 	if len(needed_item_ids) > 0:
@@ -47,23 +51,50 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 	return res_item_prices
 #end get_item_prices
 
+def read_home_file(file_name: str) -> list[str]:
+	item_lines = []
+	dye_mode = False
+
+	try:
+		with open(file_name, 'r') as file:
+			for line in file:
+				line = line.strip()
+
+				# Stop when we get to the line denoting the start of the items with dye list
+				if line == 'Furniture (With Dye)':
+					break
+
+				# Enable dye mode if we reach the dyes section (as it doesn't do the name of the dye by default)
+				if line == 'Dyes':
+					dye_mode = True
+					continue
+
+				# Skip empty, header lines and dividing lines
+				if len(line) == 0 or line[0] == '=' or ': ' not in line:
+					continue
+
+				# If in dye mode, append " Dye" to the end of the name of the item (before the semi colon)
+				if dye_mode:
+					line = line.split(': ')
+					line[0] += ' Dye'
+					line = ': '.join(line)
+				item_lines.append(line)
+	except FileNotFoundError:
+		print(f'Error: File "{file_name}" not found.')
+		sys.exit(0)
+
+	return item_lines
+#end read_home_file
+
 def main(home_file_name: str, data_center: str) -> None:
 	local_data = LocalData()
 	
 	# Each '1' representing a thousand
 	total: int = 0
 	
-	# Open the list.txt file and read each line
-	item_lines = [] # Format: "Item Name: Quantity"
-	try:
-		with open(f'./homes/{home_file_name}', 'r') as file:
-			# Loop through each line in the file
-			for line in file:
-				# Clean the line
-				line = line.strip()
-				item_lines.append(line)
-	except FileNotFoundError:
-		print(f'Error: File "{home_file_name}" not found.')
+	# Read the home file and return a list of item lines in the format "Item Name: Quantity"
+	item_lines = read_home_file(home_file_name)
+	print(f'Found {len(item_lines)} items in the list.')
 
 	# Loop through each line in chunks of 100 (max item limit for Universalis) API calls
 	for i in range(0, len(item_lines), 100):
@@ -98,7 +129,7 @@ def main(home_file_name: str, data_center: str) -> None:
 
 
 # ARGUMENTS:
-# 1: Home File Name
+# 1: Home File Name (Excluding .list.txt)
 # 2: Data Center (optional)
 if __name__ == '__main__':
 	home_file_name: str = ''
@@ -115,4 +146,20 @@ if __name__ == '__main__':
 		print('Error: No file name provided.')
 		sys.exit(0)
 
+	# Process the home file name (remove file extensions) if they're included
+	home_file_name = home_file_name.replace('.list', '')
+	home_file_name = home_file_name.replace('.txt', '')
+
+	# Load the .env file and create the path to the home file
+	load_dotenv()
+	makeplace_dir = os.getenv('MAKEPLACE_SAVES_PATH')
+	if makeplace_dir:
+		if not makeplace_dir.endswith('/'):
+			makeplace_dir += '/'
+		home_file_name = f'{makeplace_dir}{home_file_name}.list.txt'
+	else:
+		print('Error: MAKEPLACE_SAVES_PATH not found in .env file.')
+		sys.exit(0)
+
 	main(home_file_name, data_center)
+#end __main__
