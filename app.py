@@ -7,13 +7,6 @@ from lib.item import Item
 from lib.api import UniversalisApi
 
 
-# World Data: https://github.com/xivapi/ffxiv-datamining/blob/master/csv/World.csv
-# #   InternalName	Name	    Region  UserType  DataCenter  IsPublic
-# 99  Sargatanas	Sargatanas	1	    4	      4	          True
-DATA_CENTER: str = 'Aether'
-WORLD = 99 # Sargatanas
-
-
 def load_items_db() -> dict:
 	# File Structure: { "ItemId": { "en": "Item Name" }, ... }
 
@@ -81,7 +74,7 @@ def get_local_item_price(item_id: int, item_prices: list[dict]) -> int:
 	return -1
 #end get_item_price
 
-def get_item_prices(item_ids: list[int], item_prices: list[Item], items_dict: dict) -> dict:
+def get_item_prices(item_ids: list[int], item_prices: list[Item], items_dict: dict, data_center: str) -> dict:
 	# Dictionary of item prices
 	# Format: { "tem Id: Price }
 	res_item_prices = {}
@@ -101,7 +94,7 @@ def get_item_prices(item_ids: list[int], item_prices: list[Item], items_dict: di
 	# Get the prices for the items from Universalis
 	if len(needed_item_ids) > 0:
 		print(f'Getting prices for {len(needed_item_ids)} items from Universalis...')
-		api = UniversalisApi(DATA_CENTER)
+		api = UniversalisApi(data_center)
 		api_prices = api.get_item_prices(needed_item_ids)
 
 		# Get the individual prices from the API response
@@ -131,7 +124,7 @@ def set_item_price(new_item: Item, item_prices: list[dict]) -> None:
 		item_prices.append(new_item)
 #end set_item_price
 
-def main(home_file_name: str) -> None:
+def main(home_file_name: str, data_center: str) -> None:
 	local_items_dict = load_items_db()
 	local_item_prices = load_item_prices()
 	
@@ -159,7 +152,7 @@ def main(home_file_name: str) -> None:
 		item_quantities = [int(item.split(': ')[1]) for item in items]
 
 		# Get the prices for each item (in the form of a dict of item ids and prices)
-		item_prices = get_item_prices(item_ids, local_item_prices, local_items_dict)
+		item_prices = get_item_prices(item_ids, local_item_prices, local_items_dict, data_center)
 
 		# Add the total for this chunk of items
 		for j in range(len(item_ids)):
@@ -181,14 +174,22 @@ def main(home_file_name: str) -> None:
 #end main
 
 
+# ARGUMENTS:
+# 1: Home File Name
+# 2: Data Center (optional)
 if __name__ == '__main__':
 	home_file_name: str = ''
+	data_center: str = 'Aether'
 
 	# Get first argument (file name)
 	if len(sys.argv) > 1:
 		home_file_name = sys.argv[1]
+
+		# Get second argument (data center)
+		if len(sys.argv) > 2:
+			data_center = sys.argv[2]
 	else:
 		print('Error: No file name provided.')
 		sys.exit(0)
 
-	main(home_file_name)
+	main(home_file_name, data_center)
