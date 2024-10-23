@@ -5,8 +5,7 @@ Apothecary's Workbench: 1
 Assorted Candles: 1              
 Bar Counter: 1                 
 Bar Rack: 1 
-Bathroom Wall Tiles: 4
-Beyond Gloam's Veil: 1         
+Bathroom Wall Tiles: 4     
 Blank Riviera Partition: 2       
 Botanist's Dried Herbs: 1      
 Bread Basket: 1                  
