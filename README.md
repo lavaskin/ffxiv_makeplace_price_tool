@@ -1,13 +1,20 @@
 # FFXIV MakePlace Housing Price Tool
 
-Fetches relevant housing item prices and tallies them up given a MakePlace house item list form the MakePlace app.
+Fetches relevant housing item prices and tallies them up given a MakePlace house item list from the MakePlace app.
 
-Reads item data from ```items_db.json``` to then fetch prices from Universalis. Saves item prices for 24 hours, and then refetches.
+## How To Use
 
-## How To
+- Install all the packages in the packages section below.
+- Create a ```.env``` file in the root of this project, and fill out all the information specified in ```.env.example```.
+- Run the tool with python and the following parameters:
+	- <home_file_list>:  The name of the save, not the file. For example, if the file is named ```test_home_2.list.txt```, input ```test_home_2```.
+	- <data_center>: The data center to fetch prices from. Should look like: Aether, Crystal, Etc...
+- Example Run: ```python app.py <home_list_file> <data_center>```
 
-- In the ```/homes``` folder, place a MakePlace item list from the app. Remove everything outside of the furnishing list, dyes are not currently supported.
-- Run the app with python and the parameter of the item list name, and optionally your datacenter. For example: ```python3 app.py test_home.txt Crystal```.
+## Packages
+
+- [requests](https://pypi.org/project/requests/)
+- [python-dotenv](https://pypi.org/project/python-dotenv/)
 
 ## Links
 
