@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 
 from src.item import Item
-from src.api import UniversalisApi
+from src.universalis import UniversalisApi
 from src.local import LocalData
 
 
@@ -103,7 +103,6 @@ def main(home_file_name: str, data_center: str) -> None:
 		item_names = [item.split(': ')[0] for item in items_chunk]
 		item_quantities = [int(item.split(': ')[1]) for item in items_chunk]
 		item_ids = [local_data.get_item_id(name) for name in item_names]
-		
 
 		# Get the prices for each item (in the form of a dict of item ids and prices)
 		item_prices = get_item_prices(item_ids, data_center, local_data)
@@ -114,7 +113,7 @@ def main(home_file_name: str, data_center: str) -> None:
 			try:
 				item_prices[item_id]
 			except KeyError:
-				print(f'Error: Could not get price for {item_names[j]} (ID: {item_id})')
+				print(f"Warn: Couldn't get price for {item_names[j]} (ID: {item_id})")
 				continue
 			price = item_prices[item_id]
 			quantity = item_quantities[j]
