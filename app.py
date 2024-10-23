@@ -24,11 +24,8 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 		else:
 			res_item_prices[item_id] = price
 	
-	print(f' > Found {len(res_item_prices)} prices in local storage from the last 24hrs.')
-	
 	# Get the prices for the items from Universalis
 	if len(needed_item_ids) > 0:
-		print(f' > Getting {len(needed_item_ids)} prices from Universalis...')
 		api = UniversalisApi(data_center)
 		
 		# Get prices from the API for the needed items
@@ -86,7 +83,7 @@ def read_home_file(file_name: str) -> list[str]:
 	return item_lines
 #end read_home_file
 
-def main(home_file_name: str, data_center: str) -> None:
+def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 	local_data = LocalData()
 	
 	# Each '1' representing a thousand
@@ -97,7 +94,6 @@ def main(home_file_name: str, data_center: str) -> None:
 
 	# Loop through each line in chunks of 100 (max item limit for Universalis) API calls
 	for i in range(0, len(item_lines), 100):
-		print(f'Processing items {i+1}-{min(i+100, len(item_lines))}...')
 		# Get the item names and quantities from the line
 		items_chunk = item_lines[i:i+100]
 		item_names = [item.split(': ')[0] for item in items_chunk]
@@ -110,12 +106,21 @@ def main(home_file_name: str, data_center: str) -> None:
 		# Add the total for this chunk of items
 		for j in range(len(item_ids)):
 			item_id = item_ids[j]
+			
+			# Check if the item price was found
 			try:
 				item_prices[item_id]
 			except KeyError:
 				print(f"Warn: Couldn't get price for {item_names[j]} (ID: {item_id})")
 				continue
 			price = item_prices[item_id]
+
+			# Check if it's higher than the cutoff
+			if gil_cutoff > 0 and price > gil_cutoff:
+				print(f' > {item_names[j]} (ID: {item_id}) exceeded the cutoff ({price:,} Gil)')
+				continue
+
+			# Add the price to the total
 			quantity = item_quantities[j]
 			total += price * quantity
 
@@ -126,24 +131,49 @@ def main(home_file_name: str, data_center: str) -> None:
 	local_data.save_item_prices()
 #end main
 
+# For getting all the available houses to fetch item prices for in your MakePlace saves directory
+def get_house_item_list_options() -> str:
+	pass
+#end get_house_item_list_options
 
 # ARGUMENTS:
 # 1: Home File Name (Excluding .list.txt)
-# 2: Data Center (optional)
-if __name__ == '__main__':
-	home_file_name: str = ''
-	data_center: str = 'Aether'
+# 2 or 3: Data Center (optional)
+# 2 or 3: Gil Cutoff (optional)
+def get_arguments(args: list[str]) -> tuple[str, str, int]:
+	home_file_name = ''
+	data_center = 'Aether'
+	gil_cutoff = 0
 
 	# Get first argument (file name)
-	if len(sys.argv) > 1:
-		home_file_name = sys.argv[1]
-
-		# Get second argument (data center)
-		if len(sys.argv) > 2:
-			data_center = sys.argv[2]
+	if len(args) > 0:
+		home_file_name = args[0]
 	else:
 		print('\nError: No file name provided.')
 		sys.exit(1)
+
+	# Get second argument (data center OR gil cutoff)
+	if len(args) > 1:
+		# If the second argument is a number, it's the gil cutoff
+		if args[1].isdigit():
+			gil_cutoff = int(args[1])
+		else:
+			data_center = args[1]	
+
+	# Get third argument
+	if len(args) > 2:
+		# If the third argument is a number, it's the gil cutoff
+		if args[2].isdigit():
+			gil_cutoff = int(args[2])
+		else:
+			data_center = args[2]
+
+	return home_file_name, data_center, gil_cutoff
+#end get_arguments
+
+
+if __name__ == '__main__':
+	home_file_name, data_center, gil_cutoff = get_arguments(sys.argv[1:])
 
 	# Process the home file name (remove file extensions) if they're included
 	home_file_name = home_file_name.replace('.list', '')
@@ -155,10 +185,16 @@ if __name__ == '__main__':
 	if makeplace_dir:
 		if not makeplace_dir.endswith('/'):
 			makeplace_dir += '/'
+
+		# Fix windows path slashes
+		if '\\' in home_file_name:
+			home_file_name = home_file_name.replace('\\', '/')
+
 		home_file_name = f'{makeplace_dir}{home_file_name}.list.txt'
 	else:
 		print('\nError: MAKEPLACE_SAVES_PATH not found in .env file.')
 		sys.exit(1)
 
-	main(home_file_name, data_center)
+	# Run the app
+	main(home_file_name, data_center, gil_cutoff)
 #end __main__

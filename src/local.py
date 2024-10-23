@@ -65,7 +65,7 @@ class LocalData:
 
 		# Save the item prices dictionary to the JSON file
 		with open(self.item_prices_file_name, 'w') as file:
-			json.dump([item.to_dict() for item in self.item_prices], file, indent=4)
+			json.dump([item.to_dict() for item in self.item_prices], file, indent=2)
 	#end save_item_prices
 
 	def __load_items_db__(self) -> dict:
