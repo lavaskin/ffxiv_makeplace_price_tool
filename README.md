@@ -4,10 +4,12 @@ Fetches relevant housing item prices and tallies them up given a MakePlace house
 
 Reads item data from ```items_db.json``` to then fetch prices from Universalis. Saves item prices for 24 hours, and then refetches.
 
+Probably will break if there are items in the home file that aren't on the market board. I don't do enough testing.
+
 ## How To
 
 - In the ```/homes``` folder, place a MakePlace item list from the app. Remove everything outside of the furnishing list, dyes are not currently supported.
-- Run the app with python and the parameter of the item list name, for example: ```python3 app.py test_home```.
+- Run the app with python and the parameter of the item list name, for example: ```python3 app.py test_home.txt```.
 
 ## Links
 

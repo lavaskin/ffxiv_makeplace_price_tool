@@ -1,1 +1,3 @@
-data/item_prices.json
+data/*_prices.json
+.venv
+__pycache__
