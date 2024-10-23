@@ -1,0 +1,74 @@
+Antique Wall Shelf: 1
+Cake Tray: 1
+Candlelit Sundries: 1
+Carbuncle Lantern: 3
+Carpet of Flowers: 7
+Chocobo Round Table: 1
+Combed Wool Rug: 1
+Dance Pole: 3
+Doman Dogwood: 5
+Easel: 1
+Eastern Indoor Pond: 2
+Eulmoran Divan: 3
+Faerie Door: 1
+Faerie Round Table: 3
+Flagstone Loft: 1
+Floor Sofa: 1
+Fool's Threshold: 3
+Gaol Partition: 5
+Glade Flower Vase: 1
+Hanging Planter Shelf: 4
+Hingan Sideboard: 1
+Hingan Wardrobe: 4
+Hingan Windowed Partition: 1
+Hydaelyn, as We Know Her: 1
+Il Mheg Flower Lamp: 3
+Imitation Square Window: 11
+Imitation Stained Crystal Ornament: 3
+Imitation Wooden Skylight: 4
+Indoor Oriental Waterfall: 7
+Ivy Curtain: 5
+Ivy Pillar: 3
+Jellyfish Lamp: 1
+Leather Sofa: 1
+Lily Floor Lamp: 1
+Lily Wall Lamp: 1
+Llymlaen's Embrace: 1
+Log Pillar: 6
+Loporrit Mender Permit: 1
+Loporrit Servingway Permit: 1
+Luminous Wooden Loft: 2
+Macaron Cushion: 1
+Manor Harp: 2
+Marble Arch Partition: 3
+Matching Cushions: 7
+Mellow Mog Lamp: 1
+Message Book Stand: 1
+Mounted Bookshelf: 3
+Namazu Junkmonger Permit: 1
+Oldrose Wall Planter: 4
+Paissa Floor Lamp: 1
+Paissa Swing Chair: 2
+Pendant Wall Light: 1
+Philosopher's Stone Table: 1
+Rose Trellis: 3
+Sheep Rug: 1
+Slanted Skylight: 2
+Spring Meadow Partition: 10
+Stage Panel: 4
+Summoning Bell: 1
+Table Orchestrion: 1
+The Five Ages: 1
+Tree Slice Tower: 1
+Troupe Stage: 2
+Urth's Fount Phasmascape: 8
+Verdant Partition: 5
+Wall Planter: 2
+Waterfall Partition: 5
+Wood Slat Partition: 2
+Wooden Blinds: 4
+Wooden Handrail: 4
+Wooden Spiral Staircase: 4
+Wooden Staircase Bookshelf: 2
+Wooden Steps: 3
+Trick Bookshelf Partition: 1
