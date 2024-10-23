@@ -24,11 +24,11 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 		else:
 			res_item_prices[item_id] = price
 	
-	print(f'Found {len(res_item_prices)} prices in local storage from the last 24hrs.')
+	print(f' > Found {len(res_item_prices)} prices in local storage from the last 24hrs.')
 	
 	# Get the prices for the items from Universalis
 	if len(needed_item_ids) > 0:
-		print(f'Getting prices for {len(needed_item_ids)} items from Universalis...')
+		print(f' > Getting {len(needed_item_ids)} prices from Universalis...')
 		api = UniversalisApi(data_center)
 		
 		# Get prices from the API for the needed items
@@ -80,8 +80,8 @@ def read_home_file(file_name: str) -> list[str]:
 					line = ': '.join(line)
 				item_lines.append(line)
 	except FileNotFoundError:
-		print(f'Error: File "{file_name}" not found.')
-		sys.exit(0)
+		print(f'\nError: File "{file_name}" not found.')
+		sys.exit(1)
 
 	return item_lines
 #end read_home_file
@@ -94,10 +94,10 @@ def main(home_file_name: str, data_center: str) -> None:
 	
 	# Read the home file and return a list of item lines in the format "Item Name: Quantity"
 	item_lines = read_home_file(home_file_name)
-	print(f'Found {len(item_lines)} items in the list.')
 
 	# Loop through each line in chunks of 100 (max item limit for Universalis) API calls
 	for i in range(0, len(item_lines), 100):
+		print(f'Processing items {i+1}-{min(i+100, len(item_lines))}...')
 		# Get the item names and quantities from the line
 		items_chunk = item_lines[i:i+100]
 		item_names = [item.split(': ')[0] for item in items_chunk]
@@ -142,8 +142,8 @@ if __name__ == '__main__':
 		if len(sys.argv) > 2:
 			data_center = sys.argv[2]
 	else:
-		print('Error: No file name provided.')
-		sys.exit(0)
+		print('\nError: No file name provided.')
+		sys.exit(1)
 
 	# Process the home file name (remove file extensions) if they're included
 	home_file_name = home_file_name.replace('.list', '')
@@ -157,8 +157,8 @@ if __name__ == '__main__':
 			makeplace_dir += '/'
 		home_file_name = f'{makeplace_dir}{home_file_name}.list.txt'
 	else:
-		print('Error: MAKEPLACE_SAVES_PATH not found in .env file.')
-		sys.exit(0)
+		print('\nError: MAKEPLACE_SAVES_PATH not found in .env file.')
+		sys.exit(1)
 
 	main(home_file_name, data_center)
 #end __main__

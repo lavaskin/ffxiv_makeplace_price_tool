@@ -86,7 +86,7 @@ class LocalData:
 		except FileNotFoundError:
 			return []
 		except Exception as e:
-			print(f'Error: {e}')
-			sys.exit()
+			print(f'\nError: {e}')
+			sys.exit(1)
 	#end load_item_prices
 #end LocalData
