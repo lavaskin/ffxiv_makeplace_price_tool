@@ -1,80 +1,11 @@
 import sys
-import json
-import time
-import os
 
-from lib.item import Item
-from lib.api import UniversalisApi
+from src.item import Item
+from src.api import UniversalisApi
+from src.local import LocalData
 
 
-def load_items_db() -> dict:
-	# File Structure: { "ItemId": { "en": "Item Name" }, ... }
-
-	# Load in the raw items databse JSON
-	items_dict = {}
-	with open('./data/items_db.json', 'r', encoding='utf-8') as file:
-		items_dict = json.load(file)
-	return items_dict
-#end load_items_db
-
-def load_item_prices() -> list[Item]:
-	# Try to load in the raw item prices JSON
-	# If it fails, return an empty dictionary
-	try:
-		with open('./data/item_prices.json', 'r') as file:
-			data = json.load(file)
-			return [Item(**item) for item in data]
-	except FileNotFoundError:
-		return []
-	except Exception as e:
-		print(f'Error: {e}')
-		sys.exit()
-#end load_item_prices
-
-def save_item_prices(item_prices: list[Item]) -> None:
-	# Delete the old item prices JSON file
-	try:
-		os.remove('./data/item_prices.json')
-	except FileNotFoundError:
-		pass
-
-	# Sort the items by id before saving
-	item_prices.sort(key=lambda x: x.id)
-
-	# Save the item prices dictionary to the JSON file
-	with open('./data/item_prices.json', 'w') as file:
-		json.dump([item.to_dict() for item in item_prices], file, indent=4)
-#end save_item_prices
-
-def get_item_id(item_name: str, items_dict: dict) -> int:
-	# File Structure: { "ItemId": { "en": "Item Name" }, ... }
-
-	# Get the item ID from the items dictionary (the "en" property matching item)
-	item_id = next((int(k) for k, v in items_dict.items() if v['en'] == item_name), None)
-	return item_id
-#end get_item_id
-
-def get_item_name(item_id: int, items_dict: dict) -> str:
-	# File Structure: { "ItemId": { "en": "Item Name" }, ... }
-
-	# Get the item name from the items dictionary (the "en" property matching item)
-	item_name = items_dict[str(item_id)]['en']
-	return item_name
-#end get_item_name
-
-def get_local_item_price(item_id: int, item_prices: list[dict]) -> int:
-	# Get the item from the item prices list if possible
-	price_object: Item = next((x for x in item_prices if x.id == item_id), None)
-	if (price_object != None):
-		# Check if the timestamp is over 24 hours old
-		if (int(time.time()) - price_object.timestamp <= 86400):
-			return price_object.price
-	
-	# If the price isn't in the dictionary or old, return -1
-	return -1
-#end get_item_price
-
-def get_item_prices(item_ids: list[int], item_prices: list[Item], items_dict: dict, data_center: str) -> dict:
+def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData) -> dict:
 	# Dictionary of item prices
 	# Format: { "tem Id: Price }
 	res_item_prices = {}
@@ -83,7 +14,7 @@ def get_item_prices(item_ids: list[int], item_prices: list[Item], items_dict: di
 	# List of items that need to be looked up by the API
 	needed_item_ids: list[int] = []
 	for item_id in item_ids:
-		price = get_local_item_price(item_id, item_prices)
+		price = local_data.get_local_item_price(item_id)
 		
 		# If not in local storage, add to the list of items to look up
 		if price == -1:
@@ -102,7 +33,7 @@ def get_item_prices(item_ids: list[int], item_prices: list[Item], items_dict: di
 			# Get the individual prices from the API response
 			for i in range(len(needed_item_ids)):
 				item_id = needed_item_ids[i]
-				item_name = get_item_name(item_id, items_dict)
+				item_name = local_data.get_item_name(item_id)
 				api_price = int(api.get_item_price(item_id, api_prices))
 				if api_price == -1:
 					continue
@@ -110,25 +41,14 @@ def get_item_prices(item_ids: list[int], item_prices: list[Item], items_dict: di
 				# Save the new prices to the item prices dictionary
 				res_item_prices[item_id] = api_price
 				item = Item(item_id, item_name, api_price)
-				set_item_price(item, item_prices)
+				local_data.set_item_price(item)
 
 	# Return the dictionary of item prices
 	return res_item_prices
 #end get_item_prices
 
-def set_item_price(new_item: Item, item_prices: list[dict]) -> None:
-	# Set the item price in the item prices dictionary
-	existing_item = next((x for x in item_prices if x.name == new_item.name), None)
-	if existing_item:
-		existing_item.price = new_item.price
-		existing_item.timestamp = new_item.timestamp
-	else:
-		item_prices.append(new_item)
-#end set_item_price
-
 def main(home_file_name: str, data_center: str) -> None:
-	local_items_dict = load_items_db()
-	local_item_prices = load_item_prices()
+	local_data = LocalData()
 	
 	# Each '1' representing a thousand
 	total: int = 0
@@ -148,13 +68,14 @@ def main(home_file_name: str, data_center: str) -> None:
 	# Loop through each line in chunks of 100 (max item limit for Universalis) API calls
 	for i in range(0, len(item_lines), 100):
 		# Get the item names and quantities from the line
-		items = item_lines[i:i+100]
-		item_names = [item.split(': ')[0] for item in items]
-		item_ids = [get_item_id(item, local_items_dict) for item in item_names]
-		item_quantities = [int(item.split(': ')[1]) for item in items]
+		items_chunk = item_lines[i:i+100]
+		item_names = [item.split(': ')[0] for item in items_chunk]
+		item_quantities = [int(item.split(': ')[1]) for item in items_chunk]
+		item_ids = [local_data.get_item_id(name) for name in item_names]
+		
 
 		# Get the prices for each item (in the form of a dict of item ids and prices)
-		item_prices = get_item_prices(item_ids, local_item_prices, local_items_dict, data_center)
+		item_prices = get_item_prices(item_ids, data_center, local_data)
 
 		# Add the total for this chunk of items
 		for j in range(len(item_ids)):
@@ -172,7 +93,7 @@ def main(home_file_name: str, data_center: str) -> None:
 	print(f'\nApproximate Total: {int(total):,} Gil')
 
 	# Save the new price data
-	save_item_prices(local_item_prices)
+	local_data.save_item_prices()
 #end main
 
 
