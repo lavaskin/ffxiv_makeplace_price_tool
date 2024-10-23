@@ -16,11 +16,18 @@ Fetches relevant housing item prices and tallies them up given a MakePlace house
 	- ```python app.py <home_list_file> <data_center> <gil_cutoff>```
 	- ```python app.py <home_list_file> <gil_cutoff> <data_center>```
 	- ```python app.py <home_list_file> <gil_cutoff>```
+- Optionally, if you don't want to open your MakePlace Save folder, you can use: ```python app.py list``` and it will print out all the available house saves you can reference for the above commands.
+	- The "list" argument only works if no other arguments are supplied.
 
 ## Packages
 
 - [requests](https://pypi.org/project/requests/)
 - [python-dotenv](https://pypi.org/project/python-dotenv/)
+
+## Known Issues
+
+- Local prices ignore DC. So if you fetch a bunch from Aether, and then query from Crystal, it'll use the same local prices.
+	- Workaround: Delete the local ```data/item_prices.json``` file to get new prices for the new DC.
 
 ## Links
 

@@ -132,8 +132,20 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 #end main
 
 # For getting all the available houses to fetch item prices for in your MakePlace saves directory
-def get_house_item_list_options() -> str:
-	pass
+def get_house_item_list_options(makeplace_dir: str) -> str:
+	# Find all the files with the name *.list.txt in the given dir and print them out
+	try:
+		files = os.listdir(makeplace_dir)
+		house_files = [file for file in files if file.endswith('.list.txt')]
+		if len(house_files) == 0:
+			print('\nNo house files found in the MakePlace saves directory.')
+			sys.exit(1)
+		print('\nAvailable House Files:')
+		for file in house_files:
+			print(f' > {file.replace(".list.txt", "")}')
+	except FileNotFoundError:
+		print(f'\nError: Directory "{makeplace_dir}" not found.')
+		sys.exit(1)
 #end get_house_item_list_options
 
 # ARGUMENTS:
@@ -145,7 +157,7 @@ def get_arguments(args: list[str]) -> tuple[str, str, int]:
 	data_center = 'Aether'
 	gil_cutoff = 0
 
-	# Get first argument (file name)
+	# Get first argument (file name or "list")
 	if len(args) > 0:
 		home_file_name = args[0]
 	else:
@@ -175,21 +187,26 @@ def get_arguments(args: list[str]) -> tuple[str, str, int]:
 if __name__ == '__main__':
 	home_file_name, data_center, gil_cutoff = get_arguments(sys.argv[1:])
 
-	# Process the home file name (remove file extensions) if they're included
-	home_file_name = home_file_name.replace('.list', '')
-	home_file_name = home_file_name.replace('.txt', '')
-
 	# Load the .env file and create the path to the home file
 	load_dotenv()
 	makeplace_dir = os.getenv('MAKEPLACE_SAVES_PATH')
 	if makeplace_dir:
+		# Fix windows path slashes
+		makeplace_dir = makeplace_dir.replace('\\', '/')
+
+		# If the home_file_name is "list", show the available house lists
+		# Also only run if other parameters are not included as there could potentially be a house named "list"
+		print(home_file_name)
+		if home_file_name == 'list' and len(sys.argv) == 2:
+			get_house_item_list_options(makeplace_dir)
+			sys.exit(0)
+
 		if not makeplace_dir.endswith('/'):
 			makeplace_dir += '/'
 
-		# Fix windows path slashes
-		if '\\' in home_file_name:
-			home_file_name = home_file_name.replace('\\', '/')
-
+		# Process the home file name (remove file extensions) if they're included
+		home_file_name = home_file_name.replace('.list', '')
+		home_file_name = home_file_name.replace('.txt', '')
 		home_file_name = f'{makeplace_dir}{home_file_name}.list.txt'
 	else:
 		print('\nError: MAKEPLACE_SAVES_PATH not found in .env file.')
