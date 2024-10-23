@@ -95,20 +95,22 @@ def get_item_prices(item_ids: list[int], item_prices: list[Item], items_dict: di
 	if len(needed_item_ids) > 0:
 		print(f'Getting prices for {len(needed_item_ids)} items from Universalis...')
 		api = UniversalisApi(data_center)
+		
+		# Get prices from the API for the needed items
 		api_prices = api.get_item_prices(needed_item_ids)
+		if api_prices != None:
+			# Get the individual prices from the API response
+			for i in range(len(needed_item_ids)):
+				item_id = needed_item_ids[i]
+				item_name = get_item_name(item_id, items_dict)
+				api_price = int(api.get_item_price(item_id, api_prices))
+				if api_price == -1:
+					continue
 
-		# Get the individual prices from the API response
-		for i in range(len(needed_item_ids)):
-			item_id = needed_item_ids[i]
-			item_name = get_item_name(item_id, items_dict)
-			api_price = int(api.get_item_price(item_id, api_prices))
-			if api_price == -1:
-				continue
-
-			# Save the new prices to the item prices dictionary
-			res_item_prices[item_id] = api_price
-			item = Item(item_id, item_name, api_price)
-			set_item_price(item, item_prices)
+				# Save the new prices to the item prices dictionary
+				res_item_prices[item_id] = api_price
+				item = Item(item_id, item_name, api_price)
+				set_item_price(item, item_prices)
 
 	# Return the dictionary of item prices
 	return res_item_prices
@@ -167,7 +169,7 @@ def main(home_file_name: str, data_center: str) -> None:
 			total += price * quantity
 
 	# Print the total
-	print(f'\nApprox. Total: {int(total):,}')
+	print(f'\nApproximate Total: {int(total):,} Gil')
 
 	# Save the new price data
 	save_item_prices(local_item_prices)

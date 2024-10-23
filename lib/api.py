@@ -22,10 +22,8 @@ class UniversalisApi:
 		url = f'aggregated/{self.dc}/{item_list}'
 		res = self.__get__(url)
 
-		# Return the list from the response (the results object)
 		if 'results' not in res:
-			print(f'Error fetching prices: {res}\nEndpoint: {url}')
-			sys.exit(0)
+			return None
 
 		return res['results']
 	#end get_item_prices
