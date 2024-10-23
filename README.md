@@ -7,7 +7,7 @@ Fetches relevant housing item prices and tallies them up given a MakePlace house
 - Install all the packages in the packages section below.
 - Create a ```.env``` file in the root of this project, and fill out all the information specified in ```.env.example```.
 - Run the tool with python and the following parameters:
-	- <home_file_list>:  The name of the save, not the file. For example, if the file is named ```test_home_2.list.txt```, input ```test_home_2```.
+	- <home_list_file>:  The name of the save, not the file. For example, if the file is named ```test_home_2.list.txt```, input ```test_home_2```.
 	- <data_center>: The data center to fetch prices from. Should look like: Aether, Crystal, Etc...
 - Example Run: ```python app.py <home_list_file> <data_center>```
 
