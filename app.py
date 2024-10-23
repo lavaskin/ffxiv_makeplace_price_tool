@@ -110,7 +110,6 @@ def get_item_prices(item_ids: list[int], item_prices: list[Item], items_dict: di
 			item_name = get_item_name(item_id, items_dict)
 			api_price = int(api.get_item_price(item_id, api_prices))
 			if api_price == -1:
-				print(f'Error: Could not get price for {item_name} (ID: {item_id})')
 				continue
 
 			# Save the new prices to the item prices dictionary
@@ -165,6 +164,11 @@ def main(home_file_name: str) -> None:
 		# Add the total for this chunk of items
 		for j in range(len(item_ids)):
 			item_id = item_ids[j]
+			try:
+				item_prices[item_id]
+			except KeyError:
+				print(f'Error: Could not get price for {item_names[j]} (ID: {item_id})')
+				continue
 			price = item_prices[item_id]
 			quantity = item_quantities[j]
 			total += price * quantity
