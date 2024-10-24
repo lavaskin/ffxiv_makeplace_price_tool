@@ -1,6 +1,7 @@
 import sys
 import os
 from dotenv import load_dotenv
+import chardet
 
 from src.item import Item
 from src.universalis import UniversalisApi
@@ -78,7 +79,12 @@ def read_home_file(file_name: str) -> list[str]:
 	dye_mode = False
 
 	try:
-		with open(file_name, 'r') as file:
+		with open(file_name, 'rb') as file:
+			# Detect the encoding of the file
+			raw_data = file.read()
+			encoding = chardet.detect(raw_data)['encoding']
+
+		with open(file_name, 'r', encoding=encoding) as file:
 			for line in file:
 				line = line.strip()
 
@@ -131,20 +137,22 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 		item_quantities = [int(item.split(': ')[1]) for item in items_chunk]
 		# Get the item IDs from the item names and filter out any that weren't found (None)
 		item_ids = [local_data.get_item_id(item_name) for item_name in item_names]
-		item_ids = [item_id for item_id in item_ids if item_id != None]
 
 		# Get the prices for each item (in the form of a dict of item ids and prices)
 		item_prices = get_item_prices(item_ids, data_center, local_data)
 
 		# Add the total for this chunk of items
 		for j in range(len(item_ids)):
+			# Skip items if they couldn't be found
 			item_id = item_ids[j]
+			if item_id == None:
+				continue
 			
 			# Check if the item price was found
 			try:
 				item_prices[item_id]
 			except KeyError:
-				print(f"Warn: Couldn't get price for {item_names[j]} (ID: {item_id})")
+				print(f"Warn: Couldn't get price for: {item_names[j]} (ID: {item_id})")
 				continue
 			price = item_prices[item_id]
 
@@ -157,6 +165,7 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 			quantity = item_quantities[j]
 
 			# Check if it's a dye (if the last word in the name is "Dye")
+	
 			if item_names[j].split(' ')[-1] == 'Dye':
 				dye_total += price * quantity
 				num_dyes += quantity

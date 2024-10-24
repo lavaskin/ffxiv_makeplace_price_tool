@@ -23,6 +23,7 @@ Fetches relevant housing item prices and tallies them up given a MakePlace house
 
 - [requests](https://pypi.org/project/requests/)
 - [python-dotenv](https://pypi.org/project/python-dotenv/)
+- [chardet](https://pypi.org/project/chardet/)
 
 ## Known Issues
 
