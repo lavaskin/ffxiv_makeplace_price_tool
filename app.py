@@ -49,6 +49,31 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 #end get_item_prices
 
 def read_home_file(file_name: str) -> list[str]:
+	# List of "General-purpose" dyes, as general-purpose ones are listed without the "General-purpose" prefix in the list
+	# This is so that the program can find the correct item ID for the dye to look it up in the API
+	general_purpose_dyes = [
+		"Jet Black Dye",
+		"Pure White Dye",
+		"Dark Red Dye",
+		"Dark Blue Dye",
+		"Dark Brown Dye",
+		"Dark Green Dye",
+		"Pastel Pink Dye",
+		"Pastel Blue Dye",
+		"Pastel Purple Dye",
+		"Dark Purple Dye",
+		"Pastel Green Dye"
+		"Metallic Red Dye",
+		"Metallic Gold Dye",
+		"Metallic Blue Dye"
+		"Metallic Green Dye",
+		"Metallic Silver Dye",
+		"Metallic Orange Dye",
+		"Metallic Yellow Dye",
+		"Metallic Purple Dye",
+		"Metallic Sky Blue Dye",
+	]
+
 	item_lines = []
 	dye_mode = False
 
@@ -75,6 +100,10 @@ def read_home_file(file_name: str) -> list[str]:
 					line = line.split(': ')
 					line[0] += ' Dye'
 					line = ': '.join(line)
+
+					# Check if it's a general-purpose dye
+					if line.split(': ')[0] in general_purpose_dyes:
+						line = f'General-purpose {line}'
 				item_lines.append(line)
 	except FileNotFoundError:
 		print(f'\nError: File "{file_name}" not found.')
@@ -86,8 +115,10 @@ def read_home_file(file_name: str) -> list[str]:
 def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 	local_data = LocalData()
 	
-	# Each '1' representing a thousand
-	total: int = 0
+	item_total: int = 0
+	num_items: int = 0
+	dye_total: int = 0
+	num_dyes: int = 0
 	
 	# Read the home file and return a list of item lines in the format "Item Name: Quantity"
 	item_lines = read_home_file(home_file_name)
@@ -122,10 +153,19 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 
 			# Add the price to the total
 			quantity = item_quantities[j]
-			total += price * quantity
+
+			# Check if it's a dye (if the last word in the name is "Dye")
+			if item_names[j].split(' ')[-1] == 'Dye':
+				dye_total += price * quantity
+				num_dyes += quantity
+			else:
+				item_total += price * quantity
+				num_items += quantity
 
 	# Print the total
-	print(f'\nApproximate Total: {int(total):,} Gil')
+	print(f'\nApproximate Total: {int(item_total + dye_total):,} Gil')
+	print(f'Furniture Total: {item_total:,} Gil ({num_items} items)')
+	print(f'Dye Total: {dye_total:,} Gil ({num_dyes} dyes)')
 
 	# Save the new price data
 	local_data.save_item_prices()
