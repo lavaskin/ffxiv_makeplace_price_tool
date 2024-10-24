@@ -19,7 +19,7 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 		price = local_data.get_local_item_price(item_id)
 		
 		# If not in local storage, add to the list of items to look up
-		if price == -1:
+		if price == None:
 			needed_item_ids.append(item_id)
 		else:
 			res_item_prices[item_id] = price
@@ -129,7 +129,9 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 		items_chunk = item_lines[i:i+100]
 		item_names = [item.split(': ')[0] for item in items_chunk]
 		item_quantities = [int(item.split(': ')[1]) for item in items_chunk]
-		item_ids = [local_data.get_item_id(name) for name in item_names]
+		# Get the item IDs from the item names and filter out any that weren't found (None)
+		item_ids = [local_data.get_item_id(item_name) for item_name in item_names]
+		item_ids = [item_id for item_id in item_ids if item_id != None]
 
 		# Get the prices for each item (in the form of a dict of item ids and prices)
 		item_prices = get_item_prices(item_ids, data_center, local_data)

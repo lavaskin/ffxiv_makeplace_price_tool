@@ -10,6 +10,11 @@ class LocalData:
 	item_data_file_name: str = './data/items_db.json'
 	item_data: dict = None
 	item_prices: list[Item] = None
+
+	# List of items that won't appear in item_data no matter what (Herb Flower, etc.)
+	excluded_items_list: list[str] = [
+		"Herb Flower"
+	]
 	
 	def __init__(self):
 		# Load in inital data for properties
@@ -25,8 +30,8 @@ class LocalData:
 			if (int(time.time()) - price_object.timestamp <= 86400):
 				return price_object.price
 		
-		# If the price isn't in the dictionary or old, return -1
-		return -1
+		# If the price isn't in the dictionary or old, return None
+		return None
 	#end get_item_price
 
 	def set_item_price(self, new_item: Item) -> None:
@@ -42,6 +47,11 @@ class LocalData:
 	def get_item_id(self, item_name: str) -> int:
 		# Get the item ID from the items dictionary (the "en" property matching item)
 		item_id = next((int(k) for k, v in self.item_data.items() if v['en'] == item_name), None)
+
+		# If the item isn't in the db, check if it's a known exclusion and if not, print an error
+		if item_id == None and item_name not in self.excluded_items_list:
+			print(f'Error: Item "{item_name}" not found in local item database.')
+
 		return item_id
 	#end get_item_id
 
