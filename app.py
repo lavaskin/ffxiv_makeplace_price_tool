@@ -8,6 +8,9 @@ from src.universalis import UniversalisApi
 from src.local import LocalData
 
 
+UNIVERSALIS_MAX_CHUNK_SIZE = 100
+
+
 def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData) -> dict:
 	# Dictionary of item prices
 	# Format: { "tem Id: Price }
@@ -129,10 +132,9 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 	# Read the home file and return a list of item lines in the format "Item Name: Quantity"
 	item_lines = read_home_file(home_file_name)
 
-	# Loop through each line in chunks of 100 (max item limit for Universalis) API calls
-	for i in range(0, len(item_lines), 100):
+	for i in range(0, len(item_lines), UNIVERSALIS_MAX_CHUNK_SIZE):
 		# Get the item names and quantities from the line
-		items_chunk = item_lines[i:i+100]
+		items_chunk = item_lines[i:i+UNIVERSALIS_MAX_CHUNK_SIZE]
 		item_names = [item.split(': ')[0] for item in items_chunk]
 		item_quantities = [int(item.split(': ')[1]) for item in items_chunk]
 		# Get the item IDs from the item names and filter out any that weren't found (None)
