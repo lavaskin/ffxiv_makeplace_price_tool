@@ -148,6 +148,8 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 		for j in range(len(item_ids)):
 			# Skip items if they couldn't be found
 			item_id = item_ids[j]
+			item_name = item_names[j]
+			item_quantity = item_quantities[j]
 			if item_id == None:
 				continue
 			
@@ -155,13 +157,15 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 			try:
 				item_prices[item_id]
 			except KeyError:
-				print(f"Warn: Couldn't get price for: {item_names[j]} (ID: {item_id})")
+				print(f"Warn: Couldn't get price for: {item_name} (ID: {item_id})")
 				continue
 			price = item_prices[item_id]
 
 			# Check if it's higher than the cutoff
 			if gil_cutoff > 0 and price > gil_cutoff:
-				print(f' > {item_names[j]} (ID: {item_id}) exceeded the cutoff ({price:,} Gil)')
+				print(f' > {item_name} (ID: {item_id}) exceeded the cutoff ({price:,} Gil)')
+				if item_quantity > 1:
+					print(f'     Quantity: {item_quantity}, Total: {price * item_quantity:,} Gil')
 				continue
 
 			# Add the price to the total
