@@ -4,6 +4,8 @@ import sys
 import time
 import os
 
+from src.logger import *
+
 
 class LocalData:
 	item_prices_file_name: str = './data/item_prices.json'
@@ -50,7 +52,7 @@ class LocalData:
 
 		# If the item isn't in the db, check if it's a known exclusion and if not, print an error
 		if item_id == None and item_name not in self.excluded_items_list:
-			print(f'Error: Item "{item_name}" not found in local item database.')
+			log_error(f'Item "{item_name}" not found in local item database.', False)
 
 		return item_id
 	#end get_item_id
@@ -96,7 +98,7 @@ class LocalData:
 		except FileNotFoundError:
 			return []
 		except Exception as e:
-			print(f'\nError: {e}')
+			log_error(e)
 			sys.exit(1)
 	#end load_item_prices
 #end LocalData

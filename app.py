@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 import chardet
 
+from src.logger import *
 from src.item import Item
 from src.universalis import UniversalisApi
 from src.local import LocalData
@@ -30,7 +31,7 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 	
 	# Get the prices for the items from Universalis
 	if len(needed_item_ids) > 0:
-		print(f' > Getting prices for {len(needed_item_ids)} items from Universalis API...')
+		log_info(f'Getting prices for {len(needed_item_ids)} items from Universalis API...')
 		api = UniversalisApi(data_center)
 		
 		# Get prices from the API for the needed items
@@ -116,7 +117,7 @@ def read_home_file(file_name: str) -> list[str]:
 						line = f'General-purpose {line}'
 				item_lines.append(line)
 	except FileNotFoundError:
-		print(f'\nError: File "{file_name}" not found.')
+		log_error(f'File "{file_name}" not found.')
 		sys.exit(1)
 
 	return item_lines
@@ -157,15 +158,15 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 			try:
 				item_prices[item_id]
 			except KeyError:
-				print(f"Warn: Couldn't get price for: {item_name} (ID: {item_id})")
+				log_warn(f"Couldn't get price for: {item_name} (ID: {item_id})")
 				continue
 			price = item_prices[item_id]
 
 			# Check if it's higher than the cutoff
 			if gil_cutoff > 0 and price > gil_cutoff:
-				print(f' > {item_name} (ID: {item_id}) exceeded the cutoff ({price:,} Gil)')
+				log_info(f'{item_name} (ID: {item_id}) exceeded the cutoff ({price:,} Gil)')
 				if item_quantity > 1:
-					print(f'     Quantity: {item_quantity}, Total: {price * item_quantity:,} Gil')
+					log_info(f'  Quantity: {item_quantity}, Total: {price * item_quantity:,} Gil')
 				continue
 
 			# Add the price to the total
@@ -197,13 +198,13 @@ def get_house_item_list_options(makeplace_dir: str) -> str:
 		files = os.listdir(makeplace_dir)
 		house_files = [file for file in files if file.endswith('.list.txt')]
 		if len(house_files) == 0:
-			print('\nNo house files found in the MakePlace saves directory.')
+			log_error('No house files found in the MakePlace saves directory.')
 			sys.exit(1)
 		print('\nAvailable House Files:')
 		for file in house_files:
 			print(f' > {file.replace(".list.txt", "")}')
 	except FileNotFoundError:
-		print(f'\nError: Directory "{makeplace_dir}" not found.')
+		log_error(f'Directory "{makeplace_dir}" not found.')
 		sys.exit(1)
 #end get_house_item_list_options
 
@@ -220,7 +221,7 @@ def get_arguments(args: list[str]) -> tuple[str, str, int]:
 	if len(args) > 0:
 		home_file_name = args[0]
 	else:
-		print('\nError: No file name provided.')
+		log_error('No file name provided.')
 		sys.exit(1)
 
 	# Get second argument (data center OR gil cutoff)
@@ -267,7 +268,7 @@ if __name__ == '__main__':
 		home_file_name = home_file_name.replace('.txt', '')
 		home_file_name = f'{makeplace_dir}{home_file_name}.list.txt'
 	else:
-		print('\nError: MAKEPLACE_SAVES_PATH not found in .env file.')
+		log_error('MAKEPLACE_SAVES_PATH not found in .env file.')
 		sys.exit(1)
 
 	# Run the app
