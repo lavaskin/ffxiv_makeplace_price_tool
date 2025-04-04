@@ -30,6 +30,7 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 	
 	# Get the prices for the items from Universalis
 	if len(needed_item_ids) > 0:
+		print(f' > Getting prices for {len(needed_item_ids)} items from Universalis API...')
 		api = UniversalisApi(data_center)
 		
 		# Get prices from the API for the needed items
@@ -176,7 +177,8 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 				num_items += quantity
 
 	# Print the total
-	print(f'\nApproximate Total: {int(item_total + dye_total):,} Gil')
+	print('\n' + ('=' * 44))
+	print(f'Approximate Total: {int(item_total + dye_total):,} Gil')
 	print(f'Furniture Total: {item_total:,} Gil ({num_items} items)')
 	print(f'Dye Total: {dye_total:,} Gil ({num_dyes} dyes)')
 
