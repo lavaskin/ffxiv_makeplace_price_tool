@@ -164,9 +164,9 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 
 			# Check if it's higher than the cutoff
 			if gil_cutoff > 0 and price > gil_cutoff:
-				log_info(f'{item_name} (ID: {item_id}) exceeded the cutoff ({price:,} Gil)')
+				log_warn(f'{item_name} (ID: {item_id}) exceeded the cutoff ({price:,} Gil)')
 				if item_quantity > 1:
-					log_info(f'  Quantity: {item_quantity}, Total: {price * item_quantity:,} Gil')
+					log_warn(f'  Quantity: {item_quantity}, Total: {price * item_quantity:,} Gil')
 				continue
 
 			# Add the price to the total
