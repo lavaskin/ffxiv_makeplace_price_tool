@@ -35,6 +35,6 @@ Fetches relevant housing item prices and tallies them up given a MakePlace house
 
 ## Links
 
-- [MakePlace](https://makeplace.app/places): For getting house item lists
+- [ReMakePlace](https://github.com/RemakePlace): For the application to generate the housing lists this app consumes
 - [Universalis Api](https://docs.universalis.app): For the pricing data API
 - [XIV Item Dump](https://raw.githubusercontent.com/ffxiv-teamcraft/ffxiv-teamcraft/master/libs/data/src/lib/json/items.json): For local item ID lookup
