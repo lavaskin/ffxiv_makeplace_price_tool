@@ -158,15 +158,20 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 			try:
 				item_prices[item_id]
 			except KeyError:
-				log_warn(f"Couldn't get price for: {item_name} (ID: {item_id})")
+				warn_str = f"Couldn't get price for: {item_name} (ID: {item_id})"
+				if item_quantity > 1:
+					warn_str += f' / Quantity: {item_quantity}'
+				log_warn(warn_str)
 				continue
+
 			price = item_prices[item_id]
 
 			# Check if it's higher than the cutoff
 			if gil_cutoff > 0 and price > gil_cutoff:
-				log_warn(f'{item_name} (ID: {item_id}) exceeded the cutoff ({price:,} Gil)')
+				warn_str = f'{item_name} (ID: {item_id}) exceeded the cutoff ({price:,} Gil)'
 				if item_quantity > 1:
-					log_warn(f'  Quantity: {item_quantity}, Total: {price * item_quantity:,} Gil')
+					warn_str += f' / Quantity: {item_quantity}'
+				log_warn(warn_str)
 				continue
 
 			# Add the price to the total
