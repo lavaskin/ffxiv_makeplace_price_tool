@@ -10,7 +10,22 @@ from src.local import LocalData
 
 
 def output_prices(item_prices: list[Item], output_path: str) -> None:
-	pass
+	# Check if output directory exists, if not create it
+	if not os.path.exists(output_path):
+		try:
+			os.makedirs(output_path)
+		except OSError as e:
+			log_error(f'Error creating output directory: {e}')
+			return
+	
+	output_file = os.path.join(output_path, 'item_prices.txt')
+	try:
+		with open(output_file, 'w', encoding='utf-8') as f:
+			for item in item_prices:
+				f.write(f'{item.name}: {item.price}\n')
+		log_info(f'Item prices outputted to: {output_file}')
+	except OSError as e:
+		log_error(f'Error writing to output file: {e}')
 #end output_prices
 
 def get_item_prices(api: UniversalisApi, item_ids: list[int], local_data: LocalData) -> dict[int, int]:
@@ -139,10 +154,11 @@ def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
 	item_lines = read_home_file(app_config.home_file_name)
 
 	for i in range(0, len(item_lines), UNIVERSALIS_MAX_CHUNK_SIZE):
-		# Get the item names and quantities from the line
+		# Get the item names and quantities from the line ([0] is the name, [1] is the quantity) and save them to separate lists
 		items_chunk = item_lines[i:i+UNIVERSALIS_MAX_CHUNK_SIZE]
 		item_names = [item.split(': ')[0] for item in items_chunk]
 		item_quantities = [int(item.split(': ')[1]) for item in items_chunk]
+
 		# Get the item IDs from the item names and filter out any that weren't found (None)
 		item_ids = [local_data.get_item_id(item_name) for item_name in item_names]
 		item_ids = [item_id for item_id in item_ids if item_id != None]
@@ -154,10 +170,12 @@ def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
 		for j in range(len(item_ids)):
 			# Skip items if they couldn't be found
 			item_id = item_ids[j]
-			item_name = item_names[j]
-			item_quantity = item_quantities[j]
 			if item_id == None:
 				continue
+
+			# Get more item info
+			item_name = item_names[j]
+			item_quantity = item_quantities[j]
 			
 			# Check if the item's price was found
 			try:

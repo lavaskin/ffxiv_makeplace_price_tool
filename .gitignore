@@ -2,3 +2,4 @@ __pycache__
 data/*_prices.json
 .venv
 .env
+output/
