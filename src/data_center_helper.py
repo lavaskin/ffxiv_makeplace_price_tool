@@ -5,21 +5,21 @@ DATA_CENTERS = [
 	# NA
 	DataCenter('Aether', ['Adamantoise', 'Cactuar', 'Faerie', 'Gilgamesh', 'Jenova', 'Midgardsormr', 'Sargatanas', 'Siren']),
 	DataCenter('Crystal', ['Balmung', 'Brynhildr', 'Coeurl', 'Diabolos', 'Goblin', 'Malboro', 'Mateus', 'Zalera']),
-	DataCenter('Primal', []),
-	DataCenter('Dynamis', []),
+	DataCenter('Primal', ['Behemoth', 'Excalibur', 'Exodus', 'Famfrit', 'Hyperion', 'Lamia', 'Leviathan', 'Ultros']),
+	DataCenter('Dynamis', ['Cuchulainn', 'Golem', 'Halicarnassus', 'Kraken', 'Maduin', 'Marilith', 'Rafflesia', 'Seraph']),
 
 	# EU
-	DataCenter('Chaos', []),
-	DataCenter('Light', []),
+	DataCenter('Chaos', ['Cerberus', 'Louisoix', 'Moogle', 'Omega', 'Phantom', 'Ragnarok', 'Sagittarius', 'Spriggan']),
+	DataCenter('Light', ['Alpha', 'Lich', 'Odin', 'Phoenix', 'Raiden', 'Shiva', 'Twintania', 'Zodiark']),
 
 	# Japan
-	DataCenter('Elemental', ['Aegis', 'Atomos', 'Carbuncle', 'Garuda', 'Gungnir', 'Kujata', 'Tonberry', 'Typhon',]),
-	DataCenter('Gaia', []),
-	DataCenter('Mana', []),
-	DataCenter('Meteor', []),
+	DataCenter('Elemental', ['Aegis', 'Atomos', 'Carbuncle', 'Garuda', 'Gungnir', 'Kujata', 'Tonberry', 'Typhon']),
+	DataCenter('Gaia', ['Alexander', 'Bahamut', 'Durandal', 'Fenrir', 'Ifrit', 'Ridill', 'Tiamat', 'Ultima']),
+	DataCenter('Mana', ['Anima', 'Asura', 'Chocobo', 'Hades', 'Ixion', 'Masamune', 'Pandaemonium', 'Titan']),
+	DataCenter('Meteor', ['Belias', 'Mandragora', 'Ramuh', 'Shinryu', 'Unicorn', 'Valefor', 'Yojimbo', 'Zeromus']),
 
 	# Oceania
-	DataCenter('Materia', []),
+	DataCenter('Materia', ['Bismarck', 'Ravana', 'Sephirot', 'Sophia', 'Zurvan']),
 ]
 
 # Checks if a given world arg is valid, aka:
