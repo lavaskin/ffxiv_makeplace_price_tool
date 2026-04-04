@@ -1,17 +1,17 @@
-from src.item import Item
 import json
 import sys
 import time
 import os
 
+from src.models.item import Item
 from src.logger import *
 
 
 class LocalData:
 	item_prices_file_name: str = './data/item_prices.json'
 	item_data_file_name: str = './data/items_db.json'
-	item_data: dict = None
-	item_prices: list[Item] = None
+	item_data: dict = {}
+	item_prices: list[Item] = []
 
 	# List of items that won't appear in item_data no matter what (Herb Flower, etc.)
 	excluded_items_list: list[str] = [
@@ -19,14 +19,15 @@ class LocalData:
 	]
 	
 	def __init__(self):
-		# Load in inital data for properties
+		# Load in initial data for properties
 		self.item_data = self.__load_items_db__()
 		self.item_prices = self.__load_item_prices__()
 	#end __init__
 
-	def get_local_item_price(self, item_id: int) -> int:
+	def get_local_item_price(self, item_id: int) -> int | None:
 		# Get the item from the item prices list if possible
-		price_object: Item = next((x for x in self.item_prices if x.id == item_id), None)
+		price_object: Item | None = next((x for x in self.item_prices if x.id == item_id), None)
+		
 		if (price_object != None):
 			# Check if the timestamp is over 24 hours old
 			if (int(time.time()) - price_object.timestamp <= 86400):
@@ -34,7 +35,7 @@ class LocalData:
 		
 		# If the price isn't in the dictionary or old, return None
 		return None
-	#end get_item_price
+	#end get_local_item_price
 
 	def set_item_price(self, new_item: Item) -> None:
 		# Set the item price in the item prices dictionary
@@ -46,13 +47,13 @@ class LocalData:
 			self.item_prices.append(new_item)
 	#end set_item_price
 
-	def get_item_id(self, item_name: str) -> int:
+	def get_item_id(self, item_name: str) -> int | None:
 		# Get the item ID from the items dictionary (the "en" property matching item)
 		item_id = next((int(k) for k, v in self.item_data.items() if v['en'] == item_name), None)
 
 		# If the item isn't in the db, check if it's a known exclusion and if not, print an error
 		if item_id == None and item_name not in self.excluded_items_list:
-			log_error(f'Item "{item_name}" not found in local item database.', False)
+			log_warn(f'Item "{item_name}" not found in local item database.')
 
 		return item_id
 	#end get_item_id
@@ -60,9 +61,13 @@ class LocalData:
 	def get_item_name(self, item_id: int) -> str:
 		# File Structure: { "ItemId": { "en": "Item Name" }, ... }
 
-		# Get the item name from the items dictionary (the "en" property matching item)
-		item_name = self.item_data[str(item_id)]['en']
-		return item_name
+		try:
+			# Get the item name from the items dictionary (the "en" property matching item)
+			item_name = self.item_data[str(item_id)]['en']
+			return item_name
+		except KeyError:
+			log_error(f'Item ID "{item_id}" not found in local item database.')
+			sys.exit(1)
 	#end get_item_name
 
 	def save_item_prices(self) -> None:
@@ -81,7 +86,7 @@ class LocalData:
 	#end save_item_prices
 
 	def __load_items_db__(self) -> dict:
-		# Load in the raw items databse JSON
+		# Load in the raw items database JSON
 		items_dict = {}
 		with open(self.item_data_file_name, 'r', encoding='utf-8') as file:
 			items_dict = json.load(file)
@@ -98,7 +103,7 @@ class LocalData:
 		except FileNotFoundError:
 			return []
 		except Exception as e:
-			log_error(e)
+			log_error(f"Error loading item prices: {e}")
 			sys.exit(1)
 	#end load_item_prices
 #end LocalData

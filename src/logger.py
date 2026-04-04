@@ -15,6 +15,7 @@ def log_warn(message: str) -> None:
 
 def log_error(message: str, new_line: bool = True) -> None:
 	if new_line: print()
+	
 	if is_windows:
 		print(f"ERR: {message}")
 	else:

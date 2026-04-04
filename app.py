@@ -3,8 +3,8 @@ import os
 from dotenv import load_dotenv
 import chardet
 
+from src.models.item import Item
 from src.logger import *
-from src.item import Item
 from src.universalis import UniversalisApi
 from src.local import LocalData
 
@@ -57,6 +57,7 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 def read_home_file(file_name: str) -> list[str]:
 	# List of "General-purpose" dyes, as general-purpose ones are listed without the "General-purpose" prefix in the list
 	# This is so that the program can find the correct item ID for the dye to look it up in the API
+	# NOTE: Fix this when patch 7.5 drops and breaks it...
 	general_purpose_dyes = [
 		"Jet Black Dye",
 		"Pure White Dye",
@@ -141,6 +142,7 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 		item_quantities = [int(item.split(': ')[1]) for item in items_chunk]
 		# Get the item IDs from the item names and filter out any that weren't found (None)
 		item_ids = [local_data.get_item_id(item_name) for item_name in item_names]
+		item_ids = [item_id for item_id in item_ids if item_id != None]
 
 		# Get the prices for each item (in the form of a dict of item ids and prices)
 		item_prices = get_item_prices(item_ids, data_center, local_data)
@@ -168,10 +170,10 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 
 			# Check if it's higher than the cutoff
 			if gil_cutoff > 0 and price > gil_cutoff:
-				warn_str = f'{item_name} (ID: {item_id}) exceeded the cutoff ({price:,} Gil)'
+				warn_str = f'Exceeded Cutoff: {item_name} (ID: {item_id}) ({price:,} Gil)'
 				if item_quantity > 1:
 					warn_str += f' / Quantity: {item_quantity}'
-				log_warn(warn_str)
+				log_info(warn_str)
 				continue
 
 			# Add the price to the total
@@ -197,7 +199,7 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 #end main
 
 # For getting all the available houses to fetch item prices for in your MakePlace saves directory
-def get_house_item_list_options(makeplace_dir: str) -> str:
+def get_house_item_list_options(makeplace_dir: str) -> None:
 	# Find all the files with the name *.list.txt in the given dir and print them out
 	try:
 		files = os.listdir(makeplace_dir)
