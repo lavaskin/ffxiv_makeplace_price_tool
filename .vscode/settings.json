@@ -6,5 +6,8 @@
 		"remakeplace",
 		"tonberry",
 		"universalis"
+	],
+	"cSpell.ignorePaths": [
+		"data"
 	]
 }
