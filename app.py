@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import chardet
 
 from src.models.item import Item
+from src.models.env_config import EnvConfig
 from src.logger import *
 from src.universalis import UniversalisApi
 from src.local import LocalData
@@ -254,29 +255,23 @@ def get_arguments(args: list[str]) -> tuple[str, str, int]:
 if __name__ == '__main__':
 	home_file_name, data_center, gil_cutoff = get_arguments(sys.argv[1:])
 
-	# Load the .env file and create the path to the home file
-	load_dotenv()
-	makeplace_dir = os.getenv('MAKEPLACE_SAVES_PATH')
-	if makeplace_dir:
-		# Fix windows path slashes
-		makeplace_dir = makeplace_dir.replace('\\', '/')
+	# Load the environment config
+	env_config = EnvConfig()
+	log_info(f'Using saves directory: {env_config.saves_path}')
 
-		# If the home_file_name is "list", show the available house lists
-		# Also only run if other parameters are not included as there could potentially be a house named "list"
-		if home_file_name == 'list' and len(sys.argv) == 2:
-			get_house_item_list_options(makeplace_dir)
-			sys.exit(0)
+	# If the home_file_name is "list", show the available house lists
+	# Also only run if other parameters are not included as there could potentially be a house named "list"
+	if home_file_name == 'list' and len(sys.argv) == 2:
+		get_house_item_list_options(env_config.saves_path)
+		sys.exit(0)
 
-		if not makeplace_dir.endswith('/'):
-			makeplace_dir += '/'
+	if not env_config.saves_path.endswith('/'):
+		env_config.saves_path += '/'
 
-		# Process the home file name (remove file extensions) if they're included
-		home_file_name = home_file_name.replace('.list', '')
-		home_file_name = home_file_name.replace('.txt', '')
-		home_file_name = f'{makeplace_dir}{home_file_name}.list.txt'
-	else:
-		log_error('MAKEPLACE_SAVES_PATH not found in .env file.')
-		sys.exit(1)
+	# Process the home file name (remove file extensions) if they're included
+	home_file_name = home_file_name.replace('.list', '')
+	home_file_name = home_file_name.replace('.txt', '')
+	home_file_name = f'{env_config.saves_path}{home_file_name}.list.txt'
 
 	# Run the app
 	main(home_file_name, data_center, gil_cutoff)
