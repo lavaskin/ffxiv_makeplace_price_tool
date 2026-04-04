@@ -1,6 +1,5 @@
 import sys
 import os
-from dotenv import load_dotenv
 import chardet
 
 from src.models.item import Item
@@ -14,9 +13,9 @@ def output_prices(item_prices: dict[int, int], output_path: str) -> None:
 	pass
 #end output_prices
 
-def get_item_prices(api: UniversalisApi, item_ids: list[int], local_data: LocalData) -> dict:
+def get_item_prices(api: UniversalisApi, item_ids: list[int], local_data: LocalData) -> dict[int, int]:
 	# Dictionary of item prices
-	# Format: { "tem Id: Price }
+	# Format: { "ItemId: Price }
 	res_item_prices = {}
 	
 	# Get the prices for each item in the list
@@ -158,7 +157,7 @@ def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
 			if item_id == None:
 				continue
 			
-			# Check if the item price was found
+			# Check if the item's price was found
 			try:
 				item_prices[item_id]
 			except KeyError:
@@ -182,7 +181,6 @@ def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
 			quantity = item_quantities[j]
 
 			# Check if it's a dye (if the last word in the name is "Dye")
-	
 			if item_names[j].split(' ')[-1] == 'Dye':
 				dye_total += price * quantity
 				num_dyes += quantity
