@@ -28,8 +28,6 @@ Fetches relevant housing item prices and tallies them up given a MakePlace house
 
 ## Known Issues
 
-- Local prices ignore DC. So if you fetch a bunch from Aether, and then query from Crystal, it'll use the same local prices.
-  - Workaround: Delete the local ```data/item_prices.json``` file to get new prices for the new DC.
 - There are probably more items that don't exist in the ```data/item_db.json``` file that could cause problems. Currently an error is printed so this shouldn't be an issue, but could possibly cause some weird edge case.
   - If you know of any more that could be missing, add them to the ```src/local.py > excluded_items_list``` array.
 - I'm currently manually updating the items_db.json file which is suuuuper dumb. Should be fetching that on some long timestamped interval.

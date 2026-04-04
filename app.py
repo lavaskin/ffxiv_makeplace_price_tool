@@ -8,7 +8,7 @@ from src.universalis import UniversalisApi, UNIVERSALIS_MAX_CHUNK_SIZE
 from src.local import LocalData
 from src.data_center_helper import *
 
-def output_prices(item_prices: list[Item], output_path: str) -> None:
+def output_prices(item_prices: list[Item], output_path: str, price_scope: str) -> None:
 	# Check if output directory exists, if not create it
 	if not os.path.exists(output_path):
 		try:
@@ -22,7 +22,8 @@ def output_prices(item_prices: list[Item], output_path: str) -> None:
 		with open(output_file, 'w', encoding='utf-8') as f:
 			for item in item_prices:
 				f.write(f'{item.name}: {item.price}\n')
-		log_info(f'Item prices outputted to: {output_file}')
+
+		log_info(f'Item prices ({price_scope}) outputted to: {output_file}')
 	except OSError as e:
 		log_error(f'Error writing to output file: {e}')
 #end output_prices
@@ -43,6 +44,11 @@ def get_item_prices(api: UniversalisApi, item_ids: list[int], local_data: LocalD
 			needed_item_ids.append(item_id)
 		else:
 			res_item_prices[item_id] = price
+
+	# Log how many items were found in the cache vs how many needed to be looked up
+	found_in_cache = len(item_ids) - len(needed_item_ids)
+	if found_in_cache > 0:
+		log_info(f'Found prices for {found_in_cache} items in cache.')
 	
 	# Get the prices for items not in local storage from the Universalis API
 	if len(needed_item_ids) > 0:
@@ -138,8 +144,8 @@ def read_home_file(file_name: str) -> list[str]:
 	return item_lines
 #end read_home_file
 
-def main(app_config: AppConfig, api: UniversalisApi, gil_cutoff: int) -> None:
-	local_data = LocalData()
+def main(app_config: AppConfig, api: UniversalisApi, gil_cutoff: int, price_scope: str) -> None:
+	local_data = LocalData(price_scope)
 
 	output_items: list[Item] = []
 	
@@ -205,15 +211,15 @@ def main(app_config: AppConfig, api: UniversalisApi, gil_cutoff: int) -> None:
 				item_total += price * item_quantity
 				num_items += item_quantity
 
+	if app_config.outputEnabled:
+		output_prices(output_items, app_config.output_path, price_scope)
+
 	print('\n' + ('=' * 44))
 	print(f'Approximate Total: {int(item_total + dye_total):,} Gil')
 	print(f'Furniture Total: {item_total:,} Gil ({num_items} items)')
 	print(f'Dye Total: {dye_total:,} Gil ({num_dyes} dyes)')
 
 	local_data.save_item_prices()
-
-	if app_config.outputEnabled:
-		output_prices(output_items, app_config.output_path)
 #end main
 
 # For getting all the available houses to fetch item prices for in your MakePlace saves directory
@@ -276,11 +282,15 @@ if __name__ == '__main__':
 		sys.exit(1)
 
 	# Split up the data center and world if the argument is in the format "DC/World"
+	preferred_world = None
 	if '/' in data_center:
 		data_center, preferred_world = data_center.split('/')
 		api = UniversalisApi(data_center, preferred_world)
 	else:
 		api = UniversalisApi(data_center)
+
+	# Use preferred world as cache scope if provided, otherwise data center
+	price_scope = preferred_world or data_center
 
 	# Load the environment config
 	app_config = AppConfig()
@@ -296,5 +306,5 @@ if __name__ == '__main__':
 	app_config.set_home_file_name(home_file_name)
 
 	# Run the app
-	main(app_config, api, gil_cutoff)
+	main(app_config, api, gil_cutoff, price_scope)
 #end __main__
