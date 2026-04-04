@@ -9,8 +9,9 @@ UNIVERSALIS_MAX_CHUNK_SIZE = 100
 class UniversalisApi:
 	base_url: str = 'https://universalis.app/api/v2'
 	
-	def __init__(self, data_center: str):
+	def __init__(self, data_center: str, preferred_world: str | None = None) -> None:
 		self.dc = data_center
+		self.preferred_world = preferred_world
 	#end __init__
 
 	# Given a list of item ids, returns a list of objects with pricing data
