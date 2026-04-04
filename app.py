@@ -6,11 +6,8 @@ import chardet
 from src.models.item import Item
 from src.models.app_config import AppConfig
 from src.logger import *
-from src.universalis import UniversalisApi
+from src.universalis import UniversalisApi, UNIVERSALIS_MAX_CHUNK_SIZE
 from src.local import LocalData
-
-
-UNIVERSALIS_MAX_CHUNK_SIZE = 100
 
 
 def output_prices(item_prices: dict[int, int], output_path: str) -> None:
