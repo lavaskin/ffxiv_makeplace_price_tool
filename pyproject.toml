@@ -1,0 +1,23 @@
+[project]
+name = "ffxiv-makeplace-price-tool"
+version = "1.0.0"
+description = "A FFXIV housing tool to obtain the rough cost of a ReMakePlace templates furniture total"
+authors = [
+    {name = "lavaskin",email = "lavaskin@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "python-dotenv (>=1.2.2,<2.0.0)",
+    "chardet (>=7.4.0.post2,<8.0.0)",
+    "requests (>=2.33.1,<3.0.0)",
+    "termcolor (>=3.3.0,<4.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
