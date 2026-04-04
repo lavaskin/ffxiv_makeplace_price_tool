@@ -1,14 +1,12 @@
 import sys
 import os
 import chardet
-
 from src.models.item import Item
 from src.models.app_config import AppConfig
 from src.logger import *
 from src.universalis import UniversalisApi, UNIVERSALIS_MAX_CHUNK_SIZE
 from src.local import LocalData
 from src.data_center_helper import *
-
 
 def output_prices(item_prices: list[Item], output_path: str) -> None:
 	# Check if output directory exists, if not create it
@@ -269,7 +267,6 @@ def get_arguments(args: list[str]) -> tuple[str, str, int]:
 
 	return home_file_name, data_center, gil_cutoff
 #end get_arguments
-
 
 if __name__ == '__main__':
 	home_file_name, data_center, gil_cutoff = get_arguments(sys.argv[1:])

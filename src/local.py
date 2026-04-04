@@ -2,10 +2,8 @@ import json
 import sys
 import time
 import os
-
 from src.models.item import Item
 from src.logger import *
-
 
 class LocalData:
 	item_prices_file_name: str = './data/item_prices.json'

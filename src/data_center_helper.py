@@ -1,7 +1,6 @@
 from src.models.data_center import DataCenter
 from src.logger import *
 
-
 DATA_CENTERS = [
 	# NA
 	DataCenter('Aether', ['Adamantoise', 'Cactuar', 'Faerie', 'Gilgamesh', 'Jenova', 'Midgardsormr', 'Sargatanas', 'Siren']),
@@ -22,7 +21,6 @@ DATA_CENTERS = [
 	# Oceania
 	DataCenter('Materia', []),
 ]
-
 
 # Checks if a given world arg is valid, aka:
 # - If it's just a data center, check if it's valid

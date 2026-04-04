@@ -1,10 +1,7 @@
 import requests
-
 from src.logger import *
 
-
 UNIVERSALIS_MAX_CHUNK_SIZE = 100
-
 
 class UniversalisApi:
 	base_url: str = 'https://universalis.app/api/v2'

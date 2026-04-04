@@ -22,3 +22,4 @@ class Item:
 			'timestamp': self.timestamp
 		}
 	#end to_dict
+#end Item
