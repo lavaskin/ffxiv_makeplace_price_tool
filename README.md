@@ -30,7 +30,7 @@ Fetches relevant housing item prices and tallies them up given a MakePlace house
 
 - There are probably more items that don't exist in the ```data/item_db.json``` file that could cause problems. Currently an error is printed so this shouldn't be an issue, but could possibly cause some weird edge case.
   - If you know of any more that could be missing, add them to the ```src/local.py > excluded_items_list``` array.
-- I'm currently manually updating the items_db.json file which is suuuuper dumb. Should be fetching that on some long timestamped interval.
+- I'm currently manually updating the items_db.json file from the [XIV Item Dump Repo](https://raw.githubusercontent.com/ffxiv-teamcraft/ffxiv-teamcraft/master/libs/data/src/lib/json/items.json), which is suuuuper dumb. Should be fetching that on some long timestamped interval.
 
 ## Contributing
 
