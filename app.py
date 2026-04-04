@@ -9,7 +9,7 @@ from src.universalis import UniversalisApi, UNIVERSALIS_MAX_CHUNK_SIZE
 from src.local import LocalData
 
 
-def output_prices(item_prices: dict[int, int], output_path: str) -> None:
+def output_prices(item_prices: list[Item], output_path: str) -> None:
 	pass
 #end output_prices
 
@@ -127,6 +127,8 @@ def read_home_file(file_name: str) -> list[str]:
 def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
 	local_data = LocalData()
 	api = UniversalisApi(data_center)
+
+	output_items: list[Item] = []
 	
 	item_total: int = 0
 	num_items: int = 0
@@ -167,7 +169,9 @@ def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
 				log_warn(warn_str)
 				continue
 
+			# Parse the price and save the item for later output
 			price = item_prices[item_id]
+			output_items.append(Item(item_id, item_name, price))
 
 			# Check if it's higher than the cutoff
 			if gil_cutoff > 0 and price > gil_cutoff:
@@ -177,25 +181,23 @@ def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
 				log_info(warn_str)
 				continue
 
-			# Add the price to the total
-			quantity = item_quantities[j]
-
 			# Check if it's a dye (if the last word in the name is "Dye")
 			if item_names[j].split(' ')[-1] == 'Dye':
-				dye_total += price * quantity
-				num_dyes += quantity
+				dye_total += price * item_quantity
+				num_dyes += item_quantity
 			else:
-				item_total += price * quantity
-				num_items += quantity
+				item_total += price * item_quantity
+				num_items += item_quantity
 
-	# Print the total
 	print('\n' + ('=' * 44))
 	print(f'Approximate Total: {int(item_total + dye_total):,} Gil')
 	print(f'Furniture Total: {item_total:,} Gil ({num_items} items)')
 	print(f'Dye Total: {dye_total:,} Gil ({num_dyes} dyes)')
 
-	# Save the new price data
 	local_data.save_item_prices()
+
+	if app_config.outputEnabled:
+		output_prices(output_items, app_config.output_path)
 #end main
 
 # For getting all the available houses to fetch item prices for in your MakePlace saves directory
