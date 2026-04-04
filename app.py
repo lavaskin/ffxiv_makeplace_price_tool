@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import chardet
 
 from src.models.item import Item
-from src.models.env_config import EnvConfig
+from src.models.app_config import AppConfig
 from src.logger import *
 from src.universalis import UniversalisApi
 from src.local import LocalData
@@ -256,7 +256,7 @@ if __name__ == '__main__':
 	home_file_name, data_center, gil_cutoff = get_arguments(sys.argv[1:])
 
 	# Load the environment config
-	env_config = EnvConfig()
+	env_config = AppConfig()
 	log_info(f'Using saves directory: {env_config.saves_path}')
 
 	# If the home_file_name is "list", show the available house lists
