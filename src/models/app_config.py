@@ -10,6 +10,7 @@ class AppConfig:
 		self.saves_path: str = ''
 		self.outputEnabled: bool = False
 		self.output_path: str = ''
+		self.home_file_name: str = ''
 
 		if load_env:
 			self.load_env()
@@ -24,6 +25,16 @@ class AppConfig:
 		self.outputEnabled = self.__get_env_variable__('ENABLE_OUTPUT', default='false').lower() == 'true'
 		self.output_path = self.__get_env_variable__('OUTPUT_PATH', default='./output')
 	#end load_env
+
+	def set_home_file_name(self, home_file_name: str) -> None:
+		if not self.saves_path.endswith('/'):
+			self.saves_path += '/'
+
+		# Process the home file name (remove file extensions) if they're included
+		home_file_name = home_file_name.replace('.list', '')
+		home_file_name = home_file_name.replace('.txt', '')
+		self.home_file_name = f'{self.saves_path}{home_file_name}.list.txt'
+	#end set_home_file_name
 
 	def __get_env_variable__(self, key: str, default: str = '') -> str:
 		value = os.getenv(key, default)

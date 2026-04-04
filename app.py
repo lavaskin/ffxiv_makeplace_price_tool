@@ -125,7 +125,7 @@ def read_home_file(file_name: str) -> list[str]:
 	return item_lines
 #end read_home_file
 
-def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
+def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
 	local_data = LocalData()
 	
 	item_total: int = 0
@@ -134,7 +134,7 @@ def main(home_file_name: str, data_center: str, gil_cutoff: int) -> None:
 	num_dyes: int = 0
 	
 	# Read the home file and return a list of item lines in the format "Item Name: Quantity"
-	item_lines = read_home_file(home_file_name)
+	item_lines = read_home_file(app_config.home_file_name)
 
 	for i in range(0, len(item_lines), UNIVERSALIS_MAX_CHUNK_SIZE):
 		# Get the item names and quantities from the line
@@ -256,23 +256,18 @@ if __name__ == '__main__':
 	home_file_name, data_center, gil_cutoff = get_arguments(sys.argv[1:])
 
 	# Load the environment config
-	env_config = AppConfig()
-	log_info(f'Using saves directory: {env_config.saves_path}')
+	app_config = AppConfig()
+	log_info(f'Using saves directory: {app_config.saves_path}')
 
 	# If the home_file_name is "list", show the available house lists
 	# Also only run if other parameters are not included as there could potentially be a house named "list"
 	if home_file_name == 'list' and len(sys.argv) == 2:
-		get_house_item_list_options(env_config.saves_path)
+		get_house_item_list_options(app_config.saves_path)
 		sys.exit(0)
 
-	if not env_config.saves_path.endswith('/'):
-		env_config.saves_path += '/'
-
-	# Process the home file name (remove file extensions) if they're included
-	home_file_name = home_file_name.replace('.list', '')
-	home_file_name = home_file_name.replace('.txt', '')
-	home_file_name = f'{env_config.saves_path}{home_file_name}.list.txt'
+	# Parse out the given home file name
+	app_config.set_home_file_name(home_file_name)
 
 	# Run the app
-	main(home_file_name, data_center, gil_cutoff)
+	main(app_config, data_center, gil_cutoff)
 #end __main__
