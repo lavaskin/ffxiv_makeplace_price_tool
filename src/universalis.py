@@ -22,7 +22,8 @@ class UniversalisApi:
 		item_list = ','.join(map(str, item_ids))
 		
 		# Get the item prices from Universalis
-		url = f'aggregated/{self.dc}/{item_list}'
+		world_dc = self.preferred_world or self.dc
+		url = f'aggregated/{world_dc}/{item_list}'
 		res = self.__get__(url)
 
 		if 'results' not in res:
@@ -40,12 +41,13 @@ class UniversalisApi:
 		if (item == None):
 			return None
 
-		# Check first if there's a price for the item in the dc item['nq']['averageSalePrice']['dc']['price']
 		item_average_price: dict = item['nq']['averageSalePrice']
+		if 'world' in item_average_price:
+			return item_average_price['world']['price']
+		
 		if 'dc' in item_average_price:
 			return item_average_price['dc']['price']
 		
-		# Check if there's a region price for the item
 		if 'region' in item_average_price:
 			return item_average_price['region']['price']
 		
