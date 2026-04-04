@@ -32,6 +32,12 @@ Fetches relevant housing item prices and tallies them up given a MakePlace house
   - If you know of any more that could be missing, add them to the ```src/local.py > excluded_items_list``` array.
 - I'm currently manually updating the items_db.json file which is suuuuper dumb. Should be fetching that on some long timestamped interval.
 
+## Contributing
+
+If you want to submit code to the repo, feel free to make a PR targeting the dev branch and @lavaskin will review it.
+
+Feel free to fork or copy code from this project as well.
+
 ## Links
 
 - [ReMakePlace](https://github.com/RemakePlace): For the application to generate the housing lists this app consumes
