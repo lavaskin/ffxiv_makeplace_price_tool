@@ -7,6 +7,7 @@ from src.models.app_config import AppConfig
 from src.logger import *
 from src.universalis import UniversalisApi, UNIVERSALIS_MAX_CHUNK_SIZE
 from src.local import LocalData
+from src.data_center_helper import *
 
 
 def output_prices(item_prices: list[Item], output_path: str) -> None:
@@ -139,9 +140,8 @@ def read_home_file(file_name: str) -> list[str]:
 	return item_lines
 #end read_home_file
 
-def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
+def main(app_config: AppConfig, api: UniversalisApi, gil_cutoff: int) -> None:
 	local_data = LocalData()
-	api = UniversalisApi(data_center)
 
 	output_items: list[Item] = []
 	
@@ -237,7 +237,7 @@ def get_house_item_list_options(makeplace_dir: str) -> None:
 
 # ARGUMENTS:
 # 1: Home File Name (Excluding .list.txt)
-# 2 or 3: Data Center (optional)
+# 2 or 3: Data Center + World (optional)
 # 2 or 3: Gil Cutoff (optional)
 def get_arguments(args: list[str]) -> tuple[str, str, int]:
 	home_file_name = ''
@@ -274,6 +274,17 @@ def get_arguments(args: list[str]) -> tuple[str, str, int]:
 if __name__ == '__main__':
 	home_file_name, data_center, gil_cutoff = get_arguments(sys.argv[1:])
 
+	# Check that the given data center/world argument is valid
+	if not is_valid_dc_arg(data_center):
+		sys.exit(1)
+
+	# Split up the data center and world if the argument is in the format "DC/World"
+	if '/' in data_center:
+		data_center, preferred_world = data_center.split('/')
+		api = UniversalisApi(data_center, preferred_world)
+	else:
+		api = UniversalisApi(data_center)
+
 	# Load the environment config
 	app_config = AppConfig()
 	log_info(f'Using saves directory: {app_config.saves_path}')
@@ -288,5 +299,5 @@ if __name__ == '__main__':
 	app_config.set_home_file_name(home_file_name)
 
 	# Run the app
-	main(app_config, data_center, gil_cutoff)
+	main(app_config, api, gil_cutoff)
 #end __main__
