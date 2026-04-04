@@ -13,7 +13,11 @@ from src.local import LocalData
 UNIVERSALIS_MAX_CHUNK_SIZE = 100
 
 
-def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData) -> dict:
+def output_prices(item_prices: dict[int, int], output_path: str) -> None:
+	pass
+#end output_prices
+
+def get_item_prices(api: UniversalisApi, item_ids: list[int], local_data: LocalData) -> dict:
 	# Dictionary of item prices
 	# Format: { "tem Id: Price }
 	res_item_prices = {}
@@ -30,11 +34,10 @@ def get_item_prices(item_ids: list[int], data_center: str, local_data: LocalData
 		else:
 			res_item_prices[item_id] = price
 	
-	# Get the prices for the items from Universalis
+	# Get the prices for items not in local storage from the Universalis API
 	if len(needed_item_ids) > 0:
 		log_info(f'Getting prices for {len(needed_item_ids)} items from Universalis API...')
-		api = UniversalisApi(data_center)
-		
+
 		# Get prices from the API for the needed items
 		api_prices = api.get_item_prices(needed_item_ids)
 		if api_prices != None:
@@ -127,6 +130,7 @@ def read_home_file(file_name: str) -> list[str]:
 
 def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
 	local_data = LocalData()
+	api = UniversalisApi(data_center)
 	
 	item_total: int = 0
 	num_items: int = 0
@@ -146,7 +150,7 @@ def main(app_config: AppConfig, data_center: str, gil_cutoff: int) -> None:
 		item_ids = [item_id for item_id in item_ids if item_id != None]
 
 		# Get the prices for each item (in the form of a dict of item ids and prices)
-		item_prices = get_item_prices(item_ids, data_center, local_data)
+		item_prices = get_item_prices(api, item_ids, local_data)
 
 		# Add the total for this chunk of items
 		for j in range(len(item_ids)):
