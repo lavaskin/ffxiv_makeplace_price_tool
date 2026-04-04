@@ -1,11 +1,8 @@
 import json
 import sys
 import time
-import os
-
 from src.models.item import Item
 from src.logger import *
-
 
 class LocalData:
 	item_prices_file_name: str = './data/item_prices.json'
@@ -18,7 +15,8 @@ class LocalData:
 		"Herb Flower"
 	]
 	
-	def __init__(self):
+	def __init__(self, price_scope: str):
+		self.price_scope = price_scope
 		# Load in initial data for properties
 		self.item_data = self.__load_items_db__()
 		self.item_prices = self.__load_item_prices__()
@@ -71,18 +69,21 @@ class LocalData:
 	#end get_item_name
 
 	def save_item_prices(self) -> None:
-		# Delete the old item prices JSON file
+		# Load the full file so we preserve other scopes
 		try:
-			os.remove(self.item_prices_file_name)
-		except FileNotFoundError:
-			pass
+			with open(self.item_prices_file_name, 'r') as file:
+				all_prices = json.load(file)
+		except (FileNotFoundError, json.JSONDecodeError):
+			all_prices = {}
 
 		# Sort the items by id before saving
 		self.item_prices.sort(key=lambda x: x.id)
 
-		# Save the item prices dictionary to the JSON file
+		# Save this scope's prices under its key
+		all_prices[self.price_scope] = [item.to_dict() for item in self.item_prices]
+
 		with open(self.item_prices_file_name, 'w') as file:
-			json.dump([item.to_dict() for item in self.item_prices], file, indent=2)
+			json.dump(all_prices, file, indent=2)
 	#end save_item_prices
 
 	def __load_items_db__(self) -> dict:
@@ -94,12 +95,12 @@ class LocalData:
 	#end load_items_db
 
 	def __load_item_prices__(self) -> list[Item]:
-		# Try to load in the raw item prices JSON
-		# If it fails, return an empty dictionary
+		# Try to load in the raw item prices JSON and return only the current scope's data
 		try:
 			with open(self.item_prices_file_name, 'r') as file:
-				data = json.load(file)
-				return [Item(**item) for item in data]
+				all_prices = json.load(file)
+				scope_data = all_prices.get(self.price_scope, [])
+				return [Item(**item) for item in scope_data]
 		except FileNotFoundError:
 			return []
 		except Exception as e:

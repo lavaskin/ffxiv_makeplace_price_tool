@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 import os
 import sys
-
 from src.logger import *
 
 class AppConfig:
@@ -43,3 +42,4 @@ class AppConfig:
 			sys.exit(1)
 		return value
 	#end get_env_variable
+#end AppConfig
