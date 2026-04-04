@@ -1,5 +1,7 @@
 import requests
 
+from src.logger import *
+
 
 class UniversalisApi:
 	base_url: str = 'https://universalis.app/api/v2'
@@ -9,9 +11,10 @@ class UniversalisApi:
 	#end __init__
 
 	# Given a list of item ids, returns a list of objects with pricing data
-	def get_item_prices(self, item_ids: list) -> list:
+	def get_item_prices(self, item_ids: list) -> list | None:
 		# Check if amount of id's between 1 and 100
 		if (len(item_ids) < 1 or len(item_ids) > 100):
+			log_error(f'Universalis API only allows between 1 and 100 item ids per request. Got {len(item_ids)}.')
 			return None
 		
 		# Convert the list of item ids to a comma-separated string
@@ -22,6 +25,7 @@ class UniversalisApi:
 		res = self.__get__(url)
 
 		if 'results' not in res:
+			log_error(f'Universalis API response does not contain "results" field. Response: {res}')
 			return None
 
 		return res['results']
@@ -29,7 +33,7 @@ class UniversalisApi:
 
 	# Given an item id and a list of price objects from get_item_prices, returns the price of the item
 	# If the item is not found, returns None
-	def get_item_price(self, item_id: int, item_price_list: list) -> int:
+	def get_item_price(self, item_id: int, item_price_list: list) -> int | None:
 		# Find the item in the list
 		item = next((x for x in item_price_list if x['itemId'] == item_id), None)
 		if (item == None):
@@ -40,11 +44,11 @@ class UniversalisApi:
 		if 'dc' in item_average_price:
 			return item_average_price['dc']['price']
 		
-		# Check if there's a reigon price for the item
+		# Check if there's a region price for the item
 		if 'region' in item_average_price:
 			return item_average_price['region']['price']
 		
-		# If no price is found, return -1
+		# If no price is found, return None
 		return None
 	#end get_item_price
 
