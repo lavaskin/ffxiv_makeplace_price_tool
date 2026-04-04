@@ -6,6 +6,9 @@ Fetches relevant housing item prices and tallies them up given a MakePlace house
 
 - Install all the dependencies with poetry ```poetry install```
 - Create a ```.env``` file in the root of this project, and fill out all the information specified in ```.env.example```.
+  - MAKEPLACE_SAVES_PATH = The path where all of your <home_name>.list.txt files are located
+  - ENABLE_OUTPUT = Whether or not to output a text file containing all the found prices for all the homes items
+    - OUTPUT_PATH = Where to output the price list to
 - Run the tool with python and the following parameters:
   - <home_list_file> (Required):  The name of the save, not the file. For example, if the file is named ```test_home_2.list.txt```, input ```test_home_2```.
   - <data_center> (Optional): The data center to fetch prices from. Should look like: Aether, Crystal, Etc...
