@@ -1,0 +1,14 @@
+name: Link ticket
+
+on:
+  pull_request:
+    branches: [dev]
+    types: [opened, reopened, edited, synchronize]
+
+permissions: {}
+
+jobs:
+  link:
+    uses: lavaskin/ffxiv-workflows/.github/workflows/link-ticket.yml@main
+    secrets:
+      token: ${{ secrets.TICKET_LINK_TOKEN }}
